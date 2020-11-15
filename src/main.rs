@@ -1,7 +1,7 @@
 use std::io::Write;
 
-mod factorize;
 mod parser;
+mod polynomial;
 
 fn main() {
     let mut buf = String::new();
