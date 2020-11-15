@@ -1,11 +1,19 @@
 use std::str::FromStr;
-use super::{Term, Polynomial};
+use super::{Op, Term, Polynomial};
 
 grammar;
 
 pub Polynomial: Polynomial = {
-    <t:Term> <v:("+" <Term>)*> => {
-        let mut v = v;
+    <t:Term> <v:(<Op> <Term>)*> => {
+        let mut v: Vec<Term> = v
+            .into_iter()
+            .map(|(op, term)| {
+                match op {
+                    Op::Plus => term,
+                    Op::Minus => Term::new(-term.coefficient, term.exponent)
+                }
+            })
+            .collect();
         v.insert(0, t);
 
         Polynomial::new(v)
@@ -31,4 +39,9 @@ Term: Term = {
 
 Number: i32 = {
     <r"[0-9]+"> => i32::from_str(<>).unwrap(),
+}
+
+Op: Op = {
+    "+" => Op::Plus,
+    "-" => Op::Minus,
 }

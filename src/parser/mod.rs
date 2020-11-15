@@ -10,6 +10,12 @@ pub struct Term {
     exponent: i32,
 }
 
+#[derive(Debug)]
+pub enum Op {
+    Plus,
+    Minus,
+}
+
 impl Term {
     fn new(coefficient: i32, exponent: i32) -> Term {
         Term {
