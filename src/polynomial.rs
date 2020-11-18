@@ -3,8 +3,9 @@ use num::rational::{Ratio, Rational32};
 use num::{Complex, One, Signed, Zero};
 use rand::distributions::uniform::Uniform;
 use rand::Rng;
+use std::fmt::Write;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Polynomial {
     pub degree: usize,
     pub coefficients: Vec<f64>,
@@ -84,6 +85,10 @@ impl Polynomial {
             .collect()
     }
 
+    pub fn derivative(&self) -> Self {
+        self.clone()
+    }
+
     pub fn pretty_factored(&self) -> String {
         let factors = self.factors();
 
@@ -93,6 +98,37 @@ impl Polynomial {
             let sign = if factor.is_positive() { "-" } else { "+" };
             std::fmt::write(&mut pretty, format_args!("(x {} {})", sign, factor.abs())).unwrap();
         }
+
+        pretty
+    }
+
+    pub fn pretty(&self) -> String {
+        let mut pretty = String::new();
+
+        let mut iterator = self
+            .coefficients
+            .iter()
+            .enumerate()
+            .filter(|(_, x)| **x != 0.0);
+        // XXX this assumes ahead of time that there are two or more terms
+        // XXX fix
+        let _last_term = iterator.next().unwrap();
+        let mut iterator = iterator.rev();
+
+        let first_term = iterator.next().unwrap();
+        if first_term.1.is_negative() {
+            std::write!(&mut pretty, "-").unwrap();
+        }
+        if *first_term.1 != 1.0 {
+            std::fmt::write(&mut pretty, format_args!("{}", first_term.1)).unwrap();
+        }
+        if first_term.0 == 1 {
+            std::write!(&mut pretty, "x").unwrap();
+        } else if first_term.0 > 1 {
+            std::fmt::write(&mut pretty, format_args!("x^{}", first_term.0)).unwrap();
+        }
+
+        for (_exp, _coef) in iterator {}
 
         pretty
     }

@@ -1,9 +1,13 @@
 use std::str::FromStr;
-use super::{Op, Term, Polynomial};
+use super::{Op, Term, Polynomial, CommandType, Command};
 
 grammar;
 
-pub Polynomial: Polynomial = {
+pub Command: Command = {
+    <command_type:CommandType> <polynomial:Polynomial> => Command{<>}
+};
+
+Polynomial: Polynomial = {
     <t:Term> <v:(<Op> <Term>)*> => {
         let mut v: Vec<Term> = v
             .into_iter()
@@ -36,6 +40,12 @@ Term: Term = {
         Term::new(coef, exp)
     }
 }
+
+CommandType: CommandType = {
+    "factor" => CommandType::Factor,
+    "deriv" => CommandType::Derivative,
+    "int" => CommandType::Integrate,
+};
 
 Number: i32 = {
     <r"[0-9]+"> => i32::from_str(<>).unwrap(),

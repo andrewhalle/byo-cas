@@ -4,6 +4,22 @@ use std::convert::TryInto;
 
 lalrpop_mod!(pub polynomial, "/parser/polynomial.rs");
 
+// XXX maybe make a command grammar and put polynomial in its own grammar
+pub use polynomial::CommandParser;
+
+#[derive(Debug)]
+pub struct Command {
+    pub command_type: CommandType,
+    pub polynomial: Polynomial,
+}
+
+#[derive(Debug)]
+pub enum CommandType {
+    Factor,
+    Derivative,
+    Integrate,
+}
+
 #[derive(Debug)]
 pub struct Term {
     coefficient: i32,

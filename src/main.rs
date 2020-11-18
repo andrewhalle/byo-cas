@@ -3,11 +3,13 @@ use std::io::Write;
 mod parser;
 mod polynomial;
 
+use parser::CommandType;
+
 fn main() {
     let mut buf = String::new();
     let mut stdout = std::io::stdout();
     let stdin = std::io::stdin();
-    let parser = parser::polynomial::PolynomialParser::new();
+    let parser = parser::CommandParser::new();
 
     loop {
         print!("> ");
@@ -19,7 +21,11 @@ fn main() {
             break;
         }
 
-        let polynomial = parser.parse(&buf).unwrap();
-        println!("{}", polynomial.pretty_factored());
+        let command = parser.parse(&buf).unwrap();
+        match command.command_type {
+            CommandType::Factor => println!("{}", command.polynomial.pretty_factored()),
+            CommandType::Derivative => println!("{}", command.polynomial.derivative().pretty()),
+            CommandType::Integrate => unimplemented!(),
+        }
     }
 }
