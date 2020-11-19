@@ -86,7 +86,17 @@ impl Polynomial {
     }
 
     pub fn derivative(&self) -> Self {
-        self.clone()
+        let mut new = self.clone();
+
+        new.coefficients = new
+            .coefficients
+            .iter()
+            .enumerate()
+            .map(|(power, coef)| (power as f64) * *coef)
+            .skip(1)
+            .collect();
+
+        new
     }
 
     pub fn pretty_factored(&self) -> String {
@@ -102,6 +112,7 @@ impl Polynomial {
         pretty
     }
 
+    // XXX clean this up
     pub fn pretty(&self) -> String {
         let mut pretty = String::new();
 
@@ -109,11 +120,8 @@ impl Polynomial {
             .coefficients
             .iter()
             .enumerate()
-            .filter(|(_, x)| **x != 0.0);
-        // XXX this assumes ahead of time that there are two or more terms
-        // XXX fix
-        let _last_term = iterator.next().unwrap();
-        let mut iterator = iterator.rev();
+            .filter(|(_, x)| **x != 0.0)
+            .rev();
 
         let first_term = iterator.next().unwrap();
         if first_term.1.is_negative() {
@@ -128,7 +136,21 @@ impl Polynomial {
             std::fmt::write(&mut pretty, format_args!("x^{}", first_term.0)).unwrap();
         }
 
-        for (_exp, _coef) in iterator {}
+        for (exp, coef) in iterator {
+            std::write!(
+                &mut pretty,
+                "{}",
+                if coef.is_negative() { " - " } else { " + " }
+            )
+            .unwrap();
+            std::write!(&mut pretty, "{}", coef.abs()).unwrap();
+            if exp > 0 {
+                std::write!(&mut pretty, "x").unwrap();
+            }
+            if exp > 1 {
+                std::write!(&mut pretty, "^{}", exp).unwrap();
+            }
+        }
 
         pretty
     }
