@@ -25,7 +25,7 @@ fn main() {
         match command.command_type {
             CommandType::Factor => println!("{}", command.polynomial.pretty_factored()),
             CommandType::Derivative => println!("{}", command.polynomial.derivative().pretty()),
-            CommandType::Integrate => unimplemented!(),
+            CommandType::Integrate => println!("{}", command.polynomial.integral().pretty()),
         }
     }
 }

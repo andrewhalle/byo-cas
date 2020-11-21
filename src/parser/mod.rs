@@ -54,6 +54,7 @@ impl Polynomial {
         Polynomial {
             degree,
             coefficients,
+            unspecified: false,
         }
     }
 }

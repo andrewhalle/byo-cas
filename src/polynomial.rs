@@ -9,6 +9,7 @@ use std::fmt::Write;
 pub struct Polynomial {
     pub degree: usize,
     pub coefficients: Vec<f64>,
+    pub unspecified: bool,
 }
 
 type C64 = Complex<f64>;
@@ -99,6 +100,21 @@ impl Polynomial {
         new
     }
 
+    pub fn integral(&self) -> Self {
+        let mut new = self.clone();
+        new.unspecified = true;
+
+        new.coefficients = new
+            .coefficients
+            .iter()
+            .enumerate()
+            .map(|(power, coef)| (1.0 / (power as f64 + 1.0)) as f64 * *coef)
+            .collect();
+        new.coefficients.insert(0, 0.0);
+
+        new
+    }
+
     pub fn pretty_factored(&self) -> String {
         let factors = self.factors();
 
@@ -128,7 +144,14 @@ impl Polynomial {
             std::write!(&mut pretty, "-").unwrap();
         }
         if *first_term.1 != 1.0 {
-            std::fmt::write(&mut pretty, format_args!("{}", first_term.1)).unwrap();
+            std::fmt::write(
+                &mut pretty,
+                format_args!(
+                    "{}",
+                    Rational32::approximate_float(first_term.1.abs()).unwrap()
+                ),
+            )
+            .unwrap();
         }
         if first_term.0 == 1 {
             std::write!(&mut pretty, "x").unwrap();
@@ -143,13 +166,22 @@ impl Polynomial {
                 if coef.is_negative() { " - " } else { " + " }
             )
             .unwrap();
-            std::write!(&mut pretty, "{}", coef.abs()).unwrap();
+            std::write!(
+                &mut pretty,
+                "{}",
+                Rational32::approximate_float(coef.abs()).unwrap()
+            )
+            .unwrap();
             if exp > 0 {
                 std::write!(&mut pretty, "x").unwrap();
             }
             if exp > 1 {
                 std::write!(&mut pretty, "^{}", exp).unwrap();
             }
+        }
+
+        if self.unspecified {
+            std::write!(&mut pretty, " + c").unwrap();
         }
 
         pretty
