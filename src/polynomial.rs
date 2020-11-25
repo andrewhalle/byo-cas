@@ -122,7 +122,12 @@ impl Polynomial {
 
         for factor in factors.iter() {
             let sign = if factor.is_positive() { "-" } else { "+" };
-            std::fmt::write(&mut pretty, format_args!("(x {} {})", sign, factor.abs())).unwrap();
+            if factor.is_zero() {
+                std::write!(&mut pretty, "x").unwrap();
+            } else {
+                std::fmt::write(&mut pretty, format_args!("(x {} {})", sign, factor.abs()))
+                    .unwrap();
+            }
         }
 
         pretty
@@ -143,7 +148,7 @@ impl Polynomial {
         if first_term.1.is_negative() {
             std::write!(&mut pretty, "-").unwrap();
         }
-        if *first_term.1 != 1.0 {
+        if *first_term.1 != 1.0 || (*first_term.1 == 1.0 && first_term.0 == 0) {
             std::fmt::write(
                 &mut pretty,
                 format_args!(
